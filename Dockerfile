@@ -11,7 +11,7 @@ ENV FT_APP_ENV="docker"
 # Prepare environment
 RUN mkdir /freqtrade \
   && apt-get update \
-  && apt-get -y install sudo libatlas3-base curl sqlite3 libhdf5-serial-dev libgomp1 \
+  && apt-get -y install sudo libatlas3-base curl sqlite3 libhdf5-serial-dev libgomp1 wget unzip \
   && apt-get clean \
   && useradd -u 1000 -G sudo -U -m -s /bin/bash ftuser \
   && chown ftuser:ftuser /freqtrade \
@@ -49,10 +49,19 @@ USER ftuser
 # Install and execute
 COPY --chown=ftuser:ftuser . /freqtrade/
 
+# install dev ccxt
+RUN wget https://github.com/yjxiao/ccxt-python/archive/refs/heads/dev.zip \
+  && unzip dev.zip \
+  && rm dev.zip
+RUN cd ccxt-python-dev \
+  && pip install -e . --user --no-cache-dir \
+  && cd .. \
+  && rm -rf ccxt-dev
+
 RUN pip install -e . --user --no-cache-dir --no-build-isolation \
   && mkdir /freqtrade/user_data/ \
   && freqtrade install-ui
 
-ENTRYPOINT ["freqtrade"]
-# Default to trade mode
-CMD [ "trade" ]
+# ENTRYPOINT ["freqtrade"]
+# # Default to trade mode
+# CMD [ "trade" ]

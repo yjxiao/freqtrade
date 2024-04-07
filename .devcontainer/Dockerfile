@@ -18,5 +18,14 @@ USER ftuser
 
 RUN pip install --user autopep8 -r docs/requirements-docs.txt -r requirements-dev.txt --no-cache-dir
 
+# install dev ccxt
+RUN wget https://github.com/yjxiao/ccxt-python/archive/refs/heads/dev.zip \
+  && unzip dev.zip \
+  && rm dev.zip
+RUN cd ccxt-python-dev \
+  && pip install -e . --user --no-cache-dir \
+  && cd .. \
+  && rm -rf ccxt-dev
+  
 # Empty the ENTRYPOINT to allow all commands
 ENTRYPOINT []
